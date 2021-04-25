@@ -11,16 +11,18 @@ def scrape_all():
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=True)
 
-    news_title, news_paragraph = mars_news(browser)
+    news_title, news_p = mars_news(browser)
 
     # Run all scraping functions and store results in a dictionary
     data = {
         "news_title": news_title,
-        "news_paragraph": news_paragraph,
+        "news_p": news_p,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "scrape_hemisphere": scrape_hemi()
     }
+
 
     # Stop webdriver and return data
     browser.quit()
@@ -96,6 +98,47 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
+
+def scrape_hemi():
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=True)
+
+    # Use browser to visit the URL 
+    url = 'https://data-class-mars-hemispheres.s3.amazonaws.com/Mars_Hemispheres/index.html'
+    shortened_url = 'https://data-class-mars-hemispheres.s3.amazonaws.com/Mars_Hemispheres/'
+    browser.visit(url)
+
+    # Create a list to hold the images and titles.
+    hemisphere_image_urls = []
+
+    # Parse the HTML
+    html = browser.html
+    info_soup = soup(html, 'html.parser')
+
+    # Check information in the tag
+    info = info_soup.find_all('div', class_='description')
+
+    # Write code to retrieve the image urls and titles for each hemisphere.
+    for information in info:
+        # Finds the name of the Hemisphere
+        title = information.find('h3').text
+        # Finds the url link of the hemisphere and assign variable to full link
+        hemi_url = information.find('a')['href']
+        full_hemi_url = shortened_url + hemi_url
+        # Visit hemisphere browser
+        browser.visit(full_hemi_url)
+        # Parse the HTML
+        html = browser.html
+        info_soup = soup(html, 'html.parser')
+        # Check information in the tag
+        hemi_img = info_soup.find('div', class_='downloads')
+        hemi_img_url = hemi_img.find('a')['href']
+        image_url = shortened_url + hemi_img_url
+        # Creates a dictionary for the image url and title
+        image_data = dict({'img_url': image_url, 'title':title})
+        hemisphere_image_urls.append(image_data)
+    
+    return hemisphere_image_urls
 
 if __name__ == "__main__":
 
