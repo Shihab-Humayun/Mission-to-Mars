@@ -1,1 +1,3 @@
 # Mission-to-Mars
+## Purpose
+The main objectives for this project is to scrape high-resolution Mars Hemisphere images and titles from a website, be able to update the web application with Mars Hemisphere images and titles, and add Bootstrap 3 components on the web application. I used BeautifulSoup and Splinter to scrape full-resolution images of Mars’s hemispheres and the titles of those images. I used Python and HTML to create code, update the Mongo database, and modify your html file so the webpage contains all the information collected. This also includes the full-resolution image and title for each hemisphere image. I also updated the web application to make it mobile-responsive and added Bootstrap 3 components.
